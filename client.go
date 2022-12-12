@@ -66,6 +66,7 @@ type Request interface{}
 type client struct {
 	Language  string
 	UserAgent string
+	ApiKey    string
 	baseURLs  map[string]string
 	c         HTTPClient
 }

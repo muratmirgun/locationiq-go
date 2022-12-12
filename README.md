@@ -12,30 +12,19 @@
 
 *   [Installation](#installation)
 
-    *   [Package Managers](#package-managers)
-
 *   [Usage](#usage)
-
-*   [Get Support](#get-support)
-
-*   [Support Us](#support-us)
 
 *   [Authors](#authors)
 
 *   [Supporters](#supporters)
 
-    *   [Stargazers](#stargazers)
+# Pending Features
 
-    *   [Forkers](#stargazers)
-
-*   [Thanks](#thanks)
-
-*   [License](#license)
-
-*   [Status](#status)
-
-# Features
-
+*  [ ] Free Form Limit Countries Method
+*  [ ] Structured Query Method
+* [ ] Postal  Method
+* [ ] Reverse Geo Decoding Lat&Lon Method
+* [ ] Reverse Geo Decoding OSM ID & Type Method
 
 [Back To Top][top]
 
@@ -48,13 +37,6 @@
 # Installation
 
 There are various ways to install this readme template
-
-<!-- Delete The Package Managers/CDNs Not Applicable To You --> 
-<!-- Replace These Installation Instructions With Your Instructions -->
-
-## Package Managers
-
-####  **NPM** - A NodeJs Based Package Manager.
 
 ####  Bower - A Package Manager For The Web
 

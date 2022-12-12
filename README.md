@@ -1,6 +1,6 @@
 <div align="center" id="top"><p>
     <a href="https://github.com/muratmirgun/locationiq-go/commits/master"><img src="https://img.shields.io/github/last-commit/muratmirgun/locationiq-go?style=flat-square"></a>
-    <a href="#status"><img src="https://img.shields.io/badge/Maintained-yes-green.svg?style=flat-square"></a></p><img height="100px" width="500px" src="./img/logo.png">
+    <a href="#status"><img src="https://img.shields.io/badge/Maintained-yes-green.svg?style=flat-square"></a></p><img height="315px" width="600px" src="./img/logo.png">
   <br><h1>LocationIQ-GO</h1><h5>Golang Client Library for LocationIQ Api</h5><p>
    </p>
   <a href="https://github.com/muratmirgun/locationiq-go/stargazers"><img alt="GitHub Repo Stars" src="https://img.shields.io/github/stars/muratmirgun/locationiq-go?logo=Github&amp;style=for-the-badge">

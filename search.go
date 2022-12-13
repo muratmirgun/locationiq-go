@@ -9,7 +9,6 @@ const SearchURL = "/v1/search.php"
 
 // SearchRequest represents search request
 type SearchRequest struct {
-	Key    string `query:"key"`
 	Query  string `query:"q"`
 	Format string `query:"format"`
 }
@@ -32,7 +31,7 @@ type SearchResponse struct {
 
 // Search place
 func (c *client) Search(ctx context.Context, req SearchRequest) ([]SearchResponse, error) {
-	url := c.baseURLs[BackendService] + SearchURL + "?key=" + req.Key + "&q=" + req.Query + "&format=" + req.Format
+	url := c.baseURLs[BackendService] + SearchURL + "?key=" + c.Key + "&q=" + req.Query + "&format=" + req.Format
 
 	var res []SearchResponse
 

@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -43,15 +41,13 @@ var baseURLs = map[string]map[string]string{
 // struct tags and options for requests
 const (
 	queryTag        = "query"
-	formValueTag    = "form-value"
-	formFileTag     = "form-file"
-	filenameTag     = "filename"
 	omitemptySuffix = ",omitempty"
 )
 
 // Client defines behaviors of tripadvisor client
 type Client interface {
 	Search(ctx context.Context, req SearchRequest) ([]SearchResponse, error)
+	SearchLimitCountry(ctx context.Context, req SearchLimitCountryRequest) ([]SearchLimitCountryResponse, error)
 }
 
 // HTTPClient defines behaviors of http client and it is useful for mocking http client for tests
@@ -67,6 +63,7 @@ type client struct {
 	Language  string
 	UserAgent string
 	ApiKey    string
+	Key       string
 	baseURLs  map[string]string
 	c         HTTPClient
 }
@@ -74,11 +71,12 @@ type client struct {
 // compile-time proof of interface implementation
 var _ Client = (*client)(nil)
 
-// NewClient creates and returns tripadvisor client
-func NewClient(environment string, c HTTPClient) Client {
+// NewClient creates and returns LocationIQ client
+func NewClient(environment, key string, c HTTPClient) Client {
 	cli := client{
 		Language:  defaultLanguage,
 		UserAgent: defaultUserAgent,
+		Key:       key,
 		baseURLs:  baseURLs[environment],
 		c:         c,
 	}
@@ -92,43 +90,15 @@ func NewClient(environment string, c HTTPClient) Client {
 
 // request does every method's http request and returns error and http status code
 func (c *client) request(ctx context.Context, method string, url string, header map[string]string, req Request, res interface{}) (int, error) {
-	// get form values and form files
-	formValues := getFormValues(req)
-	formFiles := getFormFiles(req)
-	requestHasFormData := len(formValues) > 0 || len(formFiles) > 0
-
 	// create payload with form data or json
 	payload := bytes.Buffer{}
-	if requestHasFormData {
-		w := multipart.NewWriter(&payload)
 
-		for tag, value := range formValues {
-			_ = w.WriteField(tag, value)
-		}
-
-		for tag, formFile := range formFiles {
-			f, err := w.CreateFormFile(tag, formFile.filename)
-			if err != nil {
-				return 0, fmt.Errorf("creating form file failed, %s", err.Error())
-			}
-			r := bytes.NewBuffer(formFile.bytes)
-			_, err = io.Copy(f, r)
-			if err != nil {
-				return 0, fmt.Errorf("writing to form file failed, %s", err.Error())
-			}
-		}
-
-		_ = w.Close()
-
-		header["Content-Type"] = w.FormDataContentType()
-	} else {
-		err := json.NewEncoder(&payload).Encode(req)
-		if err != nil {
-			return 0, fmt.Errorf("decoding request failed, %s", err.Error())
-		}
-
-		header["Content-Type"] = "application/json"
+	err := json.NewEncoder(&payload).Encode(req)
+	if err != nil {
+		return 0, fmt.Errorf("decoding request failed, %s", err.Error())
 	}
+
+	header["Content-Type"] = "application/json"
 
 	// create http request
 	httpReq, err := http.NewRequestWithContext(ctx, method, url, &payload)
@@ -178,10 +148,6 @@ func (c *client) request(ctx context.Context, method string, url string, header 
 	}
 
 	return httpStatusCode, nil
-}
-
-func getFormValues(req interface{}) map[string]string {
-	return getValues(formValueTag, req)
 }
 
 func getQueryValues(req interface{}) map[string]string {
@@ -245,45 +211,6 @@ func getValues(tagName string, req interface{}) map[string]string {
 		}
 
 		res[t] = v
-	}
-
-	return res
-}
-
-type formFile struct {
-	filename string
-	bytes    []byte
-}
-
-var typeOfBytes = reflect.TypeOf([]byte(nil))
-
-func getFormFiles(req interface{}) map[string]formFile {
-	res := map[string]formFile{}
-
-	e := reflect.ValueOf(req).Elem()
-
-	for i := 0; i < e.NumField(); i++ {
-		tf := e.Type().Field(i)
-
-		t := tf.Tag.Get(formFileTag)
-		if t == "" || t == "-" {
-			continue
-		}
-
-		vf := e.Field(i)
-		if vf.Kind() != reflect.Slice && vf.Type() != typeOfBytes {
-			continue
-		}
-
-		filename := tf.Tag.Get(filenameTag)
-		if filename == "" {
-			continue
-		}
-
-		res[t] = formFile{
-			filename: filename,
-			bytes:    vf.Bytes(),
-		}
 	}
 
 	return res

@@ -48,6 +48,8 @@ const (
 type Client interface {
 	Search(ctx context.Context, req SearchRequest) ([]SearchResponse, error)
 	SearchLimitCountry(ctx context.Context, req SearchLimitCountryRequest) ([]SearchLimitCountryResponse, error)
+	Balance(ctx context.Context, req BalanceRequest) (BalanceResponse, error)
+	PostalCodeSearch(ctx context.Context, req PostalCodeSearchRequest) ([]PostalCodeSearchResponse, error)
 }
 
 // HTTPClient defines behaviors of http client and it is useful for mocking http client for tests
